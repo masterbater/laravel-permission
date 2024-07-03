@@ -8,7 +8,7 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
 
@@ -87,7 +87,7 @@ class PermissionRegistrar
         }
 
         // if an undefined cache store is specified, fallback to 'array' which is Laravel's closest equiv to 'none'
-        if (! \array_key_exists($cacheDriver, config('cache.stores'))) {
+        if (!\array_key_exists($cacheDriver, config('cache.stores'))) {
             $cacheDriver = 'array';
         }
 
@@ -122,7 +122,7 @@ class PermissionRegistrar
     public function registerPermissions(Gate $gate): bool
     {
         $gate->before(function (Authorizable $user, string $ability, array &$args = []) {
-            if (is_string($args[0] ?? null) && ! class_exists($args[0])) {
+            if (is_string($args[0] ?? null) && !class_exists($args[0])) {
                 $guard = array_shift($args);
             }
             if (method_exists($user, 'checkPermissionTo')) {
@@ -196,11 +196,13 @@ class PermissionRegistrar
         }
 
         $this->permissions = $this->cache->remember(
-            $this->cacheKey, $this->cacheExpirationTime, fn () => $this->getSerializedPermissionsForCache()
+            $this->cacheKey,
+            $this->cacheExpirationTime,
+            fn () => $this->getSerializedPermissionsForCache()
         );
 
         // fallback for old cache method, must be removed on next mayor version
-        if (! isset($this->permissions['alias'])) {
+        if (!isset($this->permissions['alias'])) {
             $this->forgetCachedPermissions();
             $this->loadPermissions();
 
@@ -301,10 +303,10 @@ class PermissionRegistrar
     private function aliasModelFields($newKeys = []): void
     {
         $i = 0;
-        $alphas = ! count($this->alias) ? range('a', 'h') : range('j', 'p');
+        $alphas = !count($this->alias) ? range('a', 'h') : range('j', 'p');
 
         foreach (array_keys($newKeys->getAttributes()) as $value) {
-            if (! isset($this->alias[$value])) {
+            if (!isset($this->alias[$value])) {
                 $this->alias[$value] = $alphas[$i++] ?? $value;
             }
         }
@@ -321,7 +323,7 @@ class PermissionRegistrar
 
         $permissions = $this->getPermissionsWithRoles()
             ->map(function ($permission) {
-                if (! $this->alias) {
+                if (!$this->alias) {
                     $this->aliasModelFields($permission);
                 }
 
@@ -335,18 +337,18 @@ class PermissionRegistrar
 
     private function getSerializedRoleRelation($permission): array
     {
-        if (! $permission->roles->count()) {
+        if (!$permission->roles->count()) {
             return [];
         }
 
-        if (! isset($this->alias['roles'])) {
+        if (!isset($this->alias['roles'])) {
             $this->alias['roles'] = 'r';
             $this->aliasModelFields($permission->roles[0]);
         }
 
         return [
             'r' => $permission->roles->map(function ($role) {
-                if (! isset($this->cachedRoles[$role->getKey()])) {
+                if (!isset($this->cachedRoles[$role->getKey()])) {
                     $this->cachedRoles[$role->getKey()] = $this->aliasedArray($role);
                 }
 
@@ -389,7 +391,7 @@ class PermissionRegistrar
 
     public static function isUid($value): bool
     {
-        if (! is_string($value) || empty(trim($value))) {
+        if (!is_string($value) || empty(trim($value))) {
             return false;
         }
 

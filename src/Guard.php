@@ -3,7 +3,7 @@
 namespace Spatie\Permission;
 
 use Illuminate\Contracts\Auth\Access\Authorizable;
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,7 +27,7 @@ class Guard
             }
         }
 
-        if (! isset($guardName)) {
+        if (!isset($guardName)) {
             $guardName = (new \ReflectionClass($class))->getDefaultProperties()['guard_name'] ?? null;
         }
 
@@ -82,19 +82,19 @@ class Guard
     {
         $guards = collect(config('auth.guards'))->where('driver', 'passport');
 
-        if (! $guards->count()) {
+        if (!$guards->count()) {
             return null;
         }
 
         $authGuard = Auth::guard($guards->keys()[0]);
 
-        if (! \method_exists($authGuard, 'client')) {
+        if (!\method_exists($authGuard, 'client')) {
             return null;
         }
 
         $client = $authGuard->client();
 
-        if (! $guard || ! $client) {
+        if (!$guard || !$client) {
             return $client;
         }
 

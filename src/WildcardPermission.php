@@ -2,7 +2,7 @@
 
 namespace Spatie\Permission;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Permission\Contracts\Wildcard;
 use Spatie\Permission\Exceptions\WildcardPermissionNotProperlyFormatted;
@@ -54,7 +54,7 @@ class WildcardPermission implements Wildcard
             throw WildcardPermissionNotProperlyFormatted::create($permission);
         }
 
-        if (! Str::contains($part, static::SUBPART_DELIMITER)) {
+        if (!Str::contains($part, static::SUBPART_DELIMITER)) {
             $index[$part] = $this->buildIndex(
                 $index[$part] ?? [],
                 $parts,
@@ -81,7 +81,7 @@ class WildcardPermission implements Wildcard
 
     public function implies(string $permission, string $guardName, array $index): bool
     {
-        if (! array_key_exists($guardName, $index)) {
+        if (!array_key_exists($guardName, $index)) {
             return false;
         }
 
